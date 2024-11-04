@@ -1,6 +1,8 @@
 from rdkit import Chem
 from rdkit.Chem import AllChem
 from rdkit.Chem import Descriptors
+from rdkit.Chem import rdMolDescriptors
+import re
 import sascorer as sa
 
 class Molecule:
@@ -33,6 +35,39 @@ class Molecule:
         if self.mol is not None:
             self.fingerprint = AllChem.GetMorganFingerprintAsBitVect(self.mol, radius=2, nBits=1024)
 
+    def calculate_ob_percentage(self):
+        """
+        Function to calculate Oxygen Bonds percentage (OB%)
+        Argument:
+            self (Molecule): Molecule object
+        Returns:
+            ob_percentage (float): Oxygen bond percentage
+        """
+        formula = rdMolDescriptors.CalcMolFormula(self.mol)
+
+        # Regular expression to match elements and their counts
+        element_counts = re.findall(r'([A-Z][a-z]*)(\d*)', formula)
+
+        # Initialize counts for C, H, O, and M
+        x = 0  # Carbon count
+        y = 0  # Hydrogen count
+        z = 0  # Oxygen count
+        m = 0  # Metal oxide count (assuming 0 at the moment)
+
+        # Loop through the element counts and assign values to C, H, O
+        for element, count in element_counts:
+            count = int(count) if count else 1  # Default to 1 if no subscript is present
+            if element == 'C':
+                x = count
+            elif element == 'H':
+                y = count
+            elif element == 'O':
+                z = count
+
+        mw = self.properties['molecular_weight']  # molecular weight
+        ob_percentage = (-1600 / mw) * (2 * x + y / 2 + m - z)
+        return ob_percentage
+
     def calculate_properties(self):
         """
         Function to calculate properties
@@ -48,6 +83,8 @@ class Molecule:
         self.properties['num_h_acceptors'] = Descriptors.NumHAcceptors(self.mol)
         self.properties['num_h_donors'] = Descriptors.NumHDonors(self.mol)
         self.properties['num_rotatable_bonds'] = Descriptors.NumRotatableBonds(self.mol)
+        # Calculate OB% property
+        self.properties['ob_percentage'] = self.calculate_ob_percentage()
         # Calculate SAScore
         try:
             self.properties['sascore'] = sa.calculateScore(self.mol)
