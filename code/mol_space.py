@@ -82,7 +82,7 @@ class MolecularSpace:
             atom_idx = random.randint(0, mol.GetNumAtoms() - 1)
             atom = mol.GetAtomWithIdx(atom_idx)
 
-            substitutions = {
+            SUBSTITUTIONS = {
                 'C': ['N', 'O', 'S'],
                 'N': ['C', 'O', 'S'],
                 'O': ['N', 'S'],
@@ -90,8 +90,8 @@ class MolecularSpace:
             }
 
             original_atom_symbol = atom.GetSymbol()
-            if original_atom_symbol in substitutions:
-                new_atom_symbol = random.choice(substitutions[original_atom_symbol])
+            if original_atom_symbol in SUBSTITUTIONS:
+                new_atom_symbol = random.choice(SUBSTITUTIONS[original_atom_symbol])
                 new_atom = Chem.Atom(new_atom_symbol)
                 new_atom.SetFormalCharge(0)  # Reset formal charge
                 mol.ReplaceAtom(atom_idx, new_atom)
@@ -178,7 +178,7 @@ class MolecularSpace:
         """
         original_smiles = Chem.MolToSmiles(molecule.mol)
         mol = Chem.RWMol(molecule.mol)
-        isosteres = {
+        ISOTERES = {
             "C(=O)O": "C(=O)NH2",  # Carboxylic acid to amide
             "C(F)(F)F": "C#N",  # Trifluoromethyl to nitrile
             "c1ccccc1": "c1ccncc1",  # Benzene to pyridine
@@ -191,7 +191,7 @@ class MolecularSpace:
         }
 
         try:
-            for original, replacement in isosteres.items():
+            for original, replacement in ISOTERES.items():
                 patt = Chem.MolFromSmarts(original)
                 repl = Chem.MolFromSmiles(replacement)
 
@@ -228,10 +228,10 @@ class MolecularSpace:
             mol(Molecule): Molecule which is represented as fingerprint
         """
         mol = Chem.RWMol(molecule.mol)
-        functional_groups = ["[OH]", "[NH2]", "[C](=O)[OH]", "[CH3]"]
+        FUNCTIONAL_GROUPS = ["[OH]", "[NH2]", "[C](=O)[OH]", "[CH3]"]
         if mol.GetNumAtoms() > 0:
             atom_idx = random.randint(0, mol.GetNumAtoms() - 1)
-            fg = Chem.MolFromSmarts(random.choice(functional_groups))
+            fg = Chem.MolFromSmarts(random.choice(FUNCTIONAL_GROUPS))
             if fg:
                 edmol = Chem.EditableMol(mol)
                 edmol.ReplaceAtom(atom_idx, fg.GetAtomWithIdx(0))
