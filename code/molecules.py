@@ -49,23 +49,23 @@ class Molecule:
         element_counts = re.findall(r'([A-Z][a-z]*)(\d*)', formula)
 
         # Initialize counts for C, H, O, and M
-        x = 0  # Carbon count
-        y = 0  # Hydrogen count
-        z = 0  # Oxygen count
-        m = 0  # Metal oxide count (assuming 0 at the moment)
+        carbon_count = 0  
+        hyrdro_count = 0  
+        oxy_count = 0
+        metal_count = 0  #(assuming 0 at the moment)
 
         # Loop through the element counts and assign values to C, H, O
         for element, count in element_counts:
             count = int(count) if count else 1  # Default to 1 if no subscript is present
             if element == 'C':
-                x = count
+                carbon_count = count
             elif element == 'H':
-                y = count
+                hyrdro_count = count
             elif element == 'O':
-                z = count
+                oxy_count = count
 
-        mw = self.properties['molecular_weight']  # molecular weight
-        ob_percentage = (-1600 / mw) * (2 * x + y / 2 + m - z)
+        mol_weight = self.properties['molecular_weight']  # molecular weight
+        ob_percentage = (-1600 / mol_weight) * (2 * carbon_count + hyrdro_count / 2 + metal_count - oxy_count)
         return ob_percentage
 
     def calculate_properties(self):
