@@ -1,5 +1,4 @@
 from rdkit import Chem
-from rdkit.Chem import AllChem
 from rdkit import DataStructs
 import random
 import logging
@@ -98,9 +97,6 @@ class MolecularSpace:
                 mol.ReplaceAtom(atom_idx, new_atom)
 
         return self.sanitize_and_optimize_molecule(mol)
-
-    from rdkit import Chem
-    from rdkit.Chem import AllChem
 
     def find_connectable_atoms(self, mol):
         """
