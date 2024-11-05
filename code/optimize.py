@@ -2,7 +2,6 @@ import numpy as np
 from rdkit import Chem
 from molecules import Molecule
 from mol_space import MolecularSpace
-from rdkit.Chem import BRICS
 
 
 class AdvancedPopulation:
@@ -17,7 +16,7 @@ class AdvancedPopulation:
         self.best_solution = None
         self.best_fitness = -float('inf')
 
-    def get_individuals(self, index):
+    def get_individual(self, index):
         """
         Function to get individual from population
         Argument:
@@ -129,7 +128,7 @@ class MolecularDifferentialEvolution:
             Chem.SanitizeMol(trial_mol)  # Try to sanitize
             trial_smiles = Chem.MolToSmiles(trial_mol)
             return Molecule(trial_smiles)
-        except Exception as e:
+        except Exception:
             return target  # Return target if trial molecule is invalid
 
     def select(self, idx, trial):
