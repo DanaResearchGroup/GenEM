@@ -42,7 +42,7 @@ def advanced_objective_function(molecule, mw_weight=0.7, sascore_weight=1.2, ob_
     return fitness_score
 
 # Example usage
-initial_smiles = [
+INITIAL_SMILES = [
     "CC(=O)OC1=CC=CC=C1C(=O)O",  # Aspirin
     "CC12CCC3C(C1CCC2O)CCC4=CC(=O)CCC34C",  # Testosterone
     "CN1CCC[C@H]1C2=CN=CC=C2",  # Nicotine
@@ -58,7 +58,7 @@ initial_smiles = [
     "CN(C)C(=O)C1=CC2=C(N1)C=CC3=C2C=CC4=C3C=CN4C"
 ]
 
-de = MolecularDifferentialEvolution(advanced_objective_function, initial_smiles, crossover_prob=0.5, max_iter=1000)
+de = MolecularDifferentialEvolution(advanced_objective_function, INITIAL_SMILES, crossover_prob=0.5, max_iter=1000)
 best_molecule, best_fitness = de.run()
 print(f"Best molecule: {best_molecule.smiles}")
 print(f"Best fitness: {best_fitness}")
