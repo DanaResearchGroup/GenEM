@@ -161,7 +161,7 @@ class MolecularDifferentialEvolution:
             best_fitness (float)
             count (int): number of unsuccessful crossovers
         """
-        for iteration in range(self.max_iter):
+        for _ in range(self.max_iter):
             for i in range(self.population_size):
                 target = self.advanced_molecular_space.population[i]
                 mutant = self.mutate(i)
