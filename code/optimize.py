@@ -1,55 +1,8 @@
 import numpy as np
 from rdkit import Chem
 from molecules import Molecule
-from mol_space import MolecularSpace
-
-
-class AdvancedPopulation:
-    """
-    Class AdvancedPopulation
-    Argument:
-        initial_smiles(list): initial smiles will represent the initial population for optimization
-    """
-    def __init__(self, initial_smiles):
-        self.population = [Molecule(smiles) for smiles in initial_smiles]
-        self.size = len(self.population)
-        self.best_solution = None
-        self.best_fitness = -float('inf')
-
-    def get_individual(self, index):
-        """
-        Function to get individual from population
-        Argument:
-            index (int): index of population
-        Returns:
-            individual at certain index
-        """
-        return self.population[index]
-
-    def update_individual(self, index, new_molecule):
-        """
-        Function to update individual from population
-        Argument:
-            index (int): index of population
-            new_molecule (AdvancedMolecule): new molecule
-        Returns:
-            new_molecule (AdvancedMolecule): updated molecule
-        """
-        self.population[index] = new_molecule
-
-    def calculate_population_fitness(self, objective_function):
-        """
-        Function to calculate population fitness using a provided objective function
-        Argument:
-            objective_function (function): objective function
-        Returns:
-            None
-        """
-        for mol in self.population:
-            fitness = objective_function(mol)
-            if fitness > self.best_fitness:
-                self.best_fitness = fitness
-                self.best_solution = mol
+import random
+import optimize_helpers as oh
 
 class MolecularDifferentialEvolution:
     """
@@ -65,7 +18,7 @@ class MolecularDifferentialEvolution:
         self.population_size = len(initial_population)
         self.crossover_prob = crossover_prob
         self.max_iter = max_iter
-        self.advanced_molecular_space = MolecularSpace(initial_population)
+        self.molecular_space = [Molecule(smiles) for smiles in initial_population]
         self.best_solution = None
         self.best_fitness = -float('inf')  # Start with negative infinity for maximization goal
         # Print initial fitness values for each molecule
@@ -78,10 +31,9 @@ class MolecularDifferentialEvolution:
             prints initial fitness values of population
         """
         print("Initial fitness values of starting molecules:")
-        for i, molecule in enumerate(self.advanced_molecular_space.population):
+        for i, molecule in enumerate(self.molecular_space):
             fitness = self.objective_function(molecule)
             print(f"Molecule {i+1}: SMILES={molecule.smiles}, Fitness={fitness}")
-
 
     def mutate(self, idx):
         """
@@ -91,8 +43,8 @@ class MolecularDifferentialEvolution:
         Returns:
             mutated molecule if mutation was successful, otherwise target (original molecule)
         """
-        target = self.advanced_molecular_space.population[idx]
-        mutant = self.advanced_molecular_space.mutate_molecule(target)
+        target = self.molecular_space[idx]
+        mutant = oh.mutate_molecule(target)
 
         if mutant is None:
             return target  # Fallback to target molecule if mutation fails
@@ -141,12 +93,12 @@ class MolecularDifferentialEvolution:
         Returns:
             trial molecule if its fitness was better than the target molecule, otherwise target (original molecule)
         """
-        target = self.advanced_molecular_space.population[idx]
+        target = self.molecular_space[idx]
         target_fitness = self.objective_function(target)
         trial_fitness = self.objective_function(trial)
 
         if trial_fitness > target_fitness:
-            self.advanced_molecular_space.population[idx] = trial
+            self.molecular_space[idx] = trial
 
         if trial_fitness > self.best_fitness:
             self.best_fitness = trial_fitness
@@ -162,7 +114,7 @@ class MolecularDifferentialEvolution:
         """
         for _ in range(self.max_iter):
             for i in range(self.population_size):
-                target = self.advanced_molecular_space.population[i]
+                target = self.molecular_space[i]
                 mutant = self.mutate(i)
                 trial = self.crossover(target, mutant)
                 self.select(i, mutant)
