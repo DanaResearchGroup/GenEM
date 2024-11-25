@@ -1,8 +1,8 @@
-from rdkit import Chem
-from rdkit.Chem import rdMolDescriptors
-from rdkit.Chem import Descriptors
 import re
+
 import sascorer as sa
+from rdkit.Chem import Descriptors, rdMolDescriptors
+
 
 def calculate_ob_percentage(mol):
     """
@@ -15,7 +15,7 @@ def calculate_ob_percentage(mol):
     formula = rdMolDescriptors.CalcMolFormula(mol)
 
     # Regular expression to match elements and their counts
-    element_counts = re.findall(r'([A-Z][a-z]*)(\d*)', formula)
+    element_counts = re.findall(r"([A-Z][a-z]*)(\d*)", formula)
 
     # Initialize counts for C, H, O, and M
     x = 0  # Carbon count
@@ -26,16 +26,17 @@ def calculate_ob_percentage(mol):
     # Loop through the element counts and assign values to C, H, O
     for element, count in element_counts:
         count = int(count) if count else 1  # Default to 1 if no subscript is present
-        if element == 'C':
+        if element == "C":
             x = count
-        elif element == 'H':
+        elif element == "H":
             y = count
-        elif element == 'O':
+        elif element == "O":
             z = count
 
     mw = Descriptors.ExactMolWt(mol)
     ob_percentage = (-1600 / mw) * (2 * x + y / 2 + m - z)
     return ob_percentage
+
 
 def calculate_sascore(mol):
     try:
