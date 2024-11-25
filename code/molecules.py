@@ -1,12 +1,9 @@
 from rdkit import Chem
-from rdkit import DataStructs
 from rdkit.Chem import AllChem
 from rdkit.Chem import Descriptors
-from rdkit.Chem import rdMolDescriptors
-import properties as p
-import logging
+#import properties as p
 import random
-import molecule_helpers
+from  molecule_helpers import combine_fragments
 
 class Molecule:
     """
@@ -30,16 +27,6 @@ class Molecule:
         self.best_solution = None
         self.best_fitness = -float('inf')
 
-    def calculate_fingerprint(self):
-        """
-        Function to calculate fingerprint
-        Argument:
-            self (Molecule): Molecule object
-        Returns:
-            Molecule's fingerprint
-        """
-        if self.mol is not None:
-            self.fingerprint = AllChem.GetMorganFingerprintAsBitVect(self.mol, radius=2, nBits=1024)
 
     def calculate_properties(self):
         """
@@ -57,9 +44,9 @@ class Molecule:
         self.properties['num_h_donors'] = Descriptors.NumHDonors(self.mol)
         self.properties['num_rotatable_bonds'] = Descriptors.NumRotatableBonds(self.mol)
         # Calculate OB% property
-        self.properties['ob_percentage'] = p.calculate_ob_percentage(self.mol)
+        #self.properties['ob_percentage'] = p.calculate_ob_percentage(self.mol)
         # Calculate SAScore
-        self.properties['sascore'] = p.calculate_sascore(self.mol)
+        #self.properties['sascore'] = p.calculate_sascore(self.mol)
 
     def update_individual(self, index, new_molecule):
         """
@@ -86,7 +73,8 @@ class Molecule:
                 self.best_fitness = fitness
                 self.best_solution = mol
 
-    def smart_atom_substitution(self, molecule):
+    @staticmethod
+    def smart_atom_substitution(mol):
         """
         Function to substitute atom with smart atom in order to increase chance of molecular validity.
         It defines allowed substitutions based on atom type and valence
@@ -96,7 +84,7 @@ class Molecule:
         Return:
             mol(Molecule): Molecule which is represented as fingerprint
         """
-        mol = Chem.RWMol(molecule.mol)
+        mol = Chem.RWMol(mol)
         if mol.GetNumAtoms() > 0:
             atom_idx = random.randint(0, mol.GetNumAtoms() - 1)
             atom = mol.GetAtomWithIdx(atom_idx)
@@ -115,9 +103,10 @@ class Molecule:
                 new_atom.SetFormalCharge(0)  # Reset formal charge
                 mol.ReplaceAtom(atom_idx, new_atom)
 
-        return self.sanitize_and_optimize_molecule(mol)
+        return Molecule.sanitize_and_optimize_molecule(mol)
 
-    def isostere_replacement(self, molecule):
+    @staticmethod
+    def isostere_replacement(mol):
         """
         Function to replace similar functional groups with other functional groups.
         Argument:
@@ -126,8 +115,8 @@ class Molecule:
         Return:
         mol(Molecule): Molecule which is represented as fingerprint
         """
-        original_smiles = Chem.MolToSmiles(molecule.mol)
-        mol = Chem.RWMol(molecule.mol)
+        original_smiles = Chem.MolToSmiles(mol)
+        mol = Chem.RWMol(mol)
         ISOSTERES = {
             "C(=O)O": "C(=O)NH2",  # Carboxylic acid to amide
             "C(F)(F)F": "C#N",  # Trifluoromethyl to nitrile
@@ -160,15 +149,16 @@ class Molecule:
         # Combine fragments if necessary
         if '.' in smiles:
             try:
-                combined_mol = self.combine_fragments(smiles)
+                combined_mol = combine_fragments(smiles)
                 if combined_mol:
                     mol = combined_mol
             except Exception:
                 return None
 
-        return self.sanitize_and_optimize_molecule(mol)
+        return Molecule.sanitize_and_optimize_molecule(mol)
 
-    def functional_group_addition(self, molecule):
+    @staticmethod
+    def functional_group_addition(mol):
         """
         Function to add functional groups to molecule.
         Argument:
@@ -177,7 +167,7 @@ class Molecule:
         Return:
             mol(Molecule): Molecule which is represented as fingerprint
         """
-        mol = Chem.RWMol(molecule.mol)
+        mol = Chem.RWMol(mol)
         FUNCTIONAL_GROUPS = ["[OH]", "[NH2]", "[C](=O)[OH]", "[CH3]"]
         if mol.GetNumAtoms() > 0:
             atom_idx = random.randint(0, mol.GetNumAtoms() - 1)
@@ -187,10 +177,10 @@ class Molecule:
                 edmol.ReplaceAtom(atom_idx, fg.GetAtomWithIdx(0))
                 mol = edmol.GetMol()
 
-        return self.sanitize_and_optimize_molecule(mol)
+        return Molecule.sanitize_and_optimize_molecule(mol)
 
-
-    def sanitize_and_optimize_molecule(self, mol):
+    @staticmethod
+    def sanitize_and_optimize_molecule (mol):
         """
         Function to sanitize the molecule after mutation to improve validity. In addition, logging has been designed
         to track invalid molecules and what mutations are causing them.
@@ -207,3 +197,4 @@ class Molecule:
             return Molecule(new_smiles)
         except Exception:
             return None
+
