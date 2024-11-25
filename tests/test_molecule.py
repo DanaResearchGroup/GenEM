@@ -7,8 +7,11 @@ from numpy.ma.testutils import assert_not_equal
 
 from constants import MOLECULES_SMILES
 from rdkit import Chem
-
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../code')))
 from molecules import Molecule
+
 
 
 class TestMolecule(unittest.TestCase):

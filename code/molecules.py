@@ -84,7 +84,7 @@ class Molecule:
         Return:
             mol(Molecule): Molecule which is represented as fingerprint
         """
-        mol = Chem.RWMol(mol)
+        mol = Chem.RWMol(mol.mol)
         if mol.GetNumAtoms() > 0:
             atom_idx = random.randint(0, mol.GetNumAtoms() - 1)
             atom = mol.GetAtomWithIdx(atom_idx)
@@ -115,8 +115,8 @@ class Molecule:
         Return:
         mol(Molecule): Molecule which is represented as fingerprint
         """
-        original_smiles = Chem.MolToSmiles(mol)
-        mol = Chem.RWMol(mol)
+        original_smiles = Chem.MolToSmiles(mol.mol)
+        mol = Chem.RWMol(mol.mol)
         ISOSTERES = {
             "C(=O)O": "C(=O)NH2",  # Carboxylic acid to amide
             "C(F)(F)F": "C#N",  # Trifluoromethyl to nitrile
@@ -167,7 +167,7 @@ class Molecule:
         Return:
             mol(Molecule): Molecule which is represented as fingerprint
         """
-        mol = Chem.RWMol(mol)
+        mol = Chem.RWMol(mol.mol)
         FUNCTIONAL_GROUPS = ["[OH]", "[NH2]", "[C](=O)[OH]", "[CH3]"]
         if mol.GetNumAtoms() > 0:
             atom_idx = random.randint(0, mol.GetNumAtoms() - 1)
