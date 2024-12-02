@@ -1,5 +1,6 @@
 import random
-from molecules import Molecule
+from code.Molecule import Molecule
+
 
 def mutate_molecule(molecule: Molecule) -> Molecule:
     """
@@ -15,7 +16,7 @@ def mutate_molecule(molecule: Molecule) -> Molecule:
     mutation_strategies = [
         molecule.smart_atom_substitution,
         molecule.isostere_replacement,
-        molecule.functional_group_addition
+        molecule.functional_group_addition,
     ]
     for _ in range(3):
         strategy = random.choice(mutation_strategies)

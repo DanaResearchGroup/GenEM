@@ -1,9 +1,9 @@
-from rdkit import Chem
-from rdkit.Chem import AllChem
-from rdkit.Chem import Descriptors
-#import properties as p
 import random
-from  molecule_helpers import combine_fragments
+from code.helpers.molecule_helpers import combine_fragments
+
+from rdkit import Chem
+from rdkit.Chem import AllChem, Descriptors
+
 
 class Molecule:
     """
@@ -12,9 +12,14 @@ class Molecule:
         smiles (str): SMILES string
         initial_population(list): List of initial molecules
     """
+
     def __init__(self, smiles, initial_population=None):
         self.smiles = smiles
-        self.population = [Molecule(smiles) for smiles in initial_population] if initial_population else []
+        self.population = (
+            [Molecule(smiles) for smiles in initial_population]
+            if initial_population
+            else []
+        )
         try:
             self.mol = Chem.MolFromSmiles(smiles)
             if self.mol is None:
@@ -25,8 +30,7 @@ class Molecule:
         self.fingerprint = None
         self.properties = {}
         self.best_solution = None
-        self.best_fitness = -float('inf')
-
+        self.best_fitness = -float("inf")
 
     def calculate_properties(self):
         """
@@ -38,15 +42,11 @@ class Molecule:
         """
         if self.mol is None:
             raise ValueError("Molecule is not valid.")
-        self.properties['molecular_weight'] = Descriptors.ExactMolWt(self.mol)
-        self.properties['logp'] = Descriptors.MolLogP(self.mol)
-        self.properties['num_h_acceptors'] = Descriptors.NumHAcceptors(self.mol)
-        self.properties['num_h_donors'] = Descriptors.NumHDonors(self.mol)
-        self.properties['num_rotatable_bonds'] = Descriptors.NumRotatableBonds(self.mol)
-        # Calculate OB% property
-        #self.properties['ob_percentage'] = p.calculate_ob_percentage(self.mol)
-        # Calculate SAScore
-        #self.properties['sascore'] = p.calculate_sascore(self.mol)
+        self.properties["molecular_weight"] = Descriptors.ExactMolWt(self.mol)
+        self.properties["logp"] = Descriptors.MolLogP(self.mol)
+        self.properties["num_h_acceptors"] = Descriptors.NumHAcceptors(self.mol)
+        self.properties["num_h_donors"] = Descriptors.NumHDonors(self.mol)
+        self.properties["num_rotatable_bonds"] = Descriptors.NumRotatableBonds(self.mol)
 
     def update_individual(self, index, new_molecule):
         """
@@ -90,10 +90,10 @@ class Molecule:
             atom = mol.GetAtomWithIdx(atom_idx)
 
             SUBSTITUTIONS = {
-                'C': ['N', 'O', 'S'],
-                'N': ['C', 'O', 'S'],
-                'O': ['N', 'S'],
-                'S': ['O', 'N']
+                "C": ["N", "O", "S"],
+                "N": ["C", "O", "S"],
+                "O": ["N", "S"],
+                "S": ["O", "N"],
             }
 
             original_atom_symbol = atom.GetSymbol()
@@ -126,7 +126,7 @@ class Molecule:
             "C[N+](=O)[O-]": "C1=CC=C(C(=O)O)C=C1",  # Nitro to carboxyl group
             # Nitro group replacement to fused ring system
             "[O-][N+](=O)C": "[O-][N+](=O)C1=CC=CC=C1",  # Nitro group to phenyl ring
-            "[N+](=O)[O-]": "[N+](=O)[O-]C1=CC=C(C(=O)O)C=C1"  # Nitro group to substituted phenyl ring
+            "[N+](=O)[O-]": "[N+](=O)[O-]C1=CC=C(C(=O)O)C=C1",  # Nitro group to substituted phenyl ring
         }
 
         try:
@@ -147,7 +147,7 @@ class Molecule:
             return None
 
         # Combine fragments if necessary
-        if '.' in smiles:
+        if "." in smiles:
             try:
                 combined_mol = combine_fragments(smiles)
                 if combined_mol:
@@ -180,7 +180,7 @@ class Molecule:
         return Molecule.sanitize_and_optimize_molecule(mol)
 
     @staticmethod
-    def sanitize_and_optimize_molecule (mol):
+    def sanitize_and_optimize_molecule(mol):
         """
         Function to sanitize the molecule after mutation to improve validity. In addition, logging has been designed
         to track invalid molecules and what mutations are causing them.
@@ -197,4 +197,3 @@ class Molecule:
             return Molecule(new_smiles)
         except Exception:
             return None
-

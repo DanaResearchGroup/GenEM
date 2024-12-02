@@ -1,8 +1,9 @@
+import code.helpers.optimize_helpers as oh
+from code.Molecule import Molecule
+
 import numpy as np
 from rdkit import Chem
-from molecules import Molecule
-import random
-import optimize_helpers as oh
+
 
 class MolecularDifferentialEvolution:
     """
@@ -13,14 +14,19 @@ class MolecularDifferentialEvolution:
         crossover_prob (float): crossover probability
         max_iter (int): maximum number of iterations
     """
-    def __init__(self, objective_function, initial_population, crossover_prob=0.7, max_iter=1000):
+
+    def __init__(
+        self, objective_function, initial_population, crossover_prob=0.7, max_iter=1000
+    ):
         self.objective_function = objective_function
         self.population_size = len(initial_population)
         self.crossover_prob = crossover_prob
         self.max_iter = max_iter
         self.molecular_space = [Molecule(smiles) for smiles in initial_population]
         self.best_solution = None
-        self.best_fitness = -float('inf')  # Start with negative infinity for maximization goal
+        self.best_fitness = -float(
+            "inf"
+        )  # Start with negative infinity for maximization goal
         # Print initial fitness values for each molecule
         self.print_initial_fitness()
 
@@ -70,7 +76,9 @@ class MolecularDifferentialEvolution:
             if target_mol is None or mutant_mol is None:
                 return target  # Fallback to target if conversion fails
 
-            crossover_mask = np.random.rand(target_mol.GetNumAtoms()) < self.crossover_prob
+            crossover_mask = (
+                np.random.rand(target_mol.GetNumAtoms()) < self.crossover_prob
+            )
             trial_mol = Chem.RWMol(target_mol)
 
             for i in range(trial_mol.GetNumAtoms()):
@@ -116,7 +124,7 @@ class MolecularDifferentialEvolution:
             for i in range(self.population_size):
                 target = self.molecular_space[i]
                 mutant = self.mutate(i)
-                trial = self.crossover(target, mutant)
+                self.crossover(target, mutant)
                 self.select(i, mutant)
 
         return self.best_solution, self.best_fitness

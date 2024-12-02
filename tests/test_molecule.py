@@ -1,17 +1,8 @@
-#!/usr/bin/env python3
-# encoding: utf-8
-
 import unittest
+from code.helpers.constants import MOLECULES_SMILES
+from code.Molecule import Molecule
 
-from numpy.ma.testutils import assert_not_equal
-
-from constants import MOLECULES_SMILES
 from rdkit import Chem
-import sys
-import os
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../code')))
-from molecules import Molecule
-
 
 
 class TestMolecule(unittest.TestCase):
@@ -35,16 +26,15 @@ class TestMolecule(unittest.TestCase):
 
     def test_smart_atom_substitution(self):
         for mol in [self.ethanol, self.tnt]:
-            mutated_mol = Molecule.smart_atom_substitution(mol.mol)
+            mutated_mol = Molecule.smart_atom_substitution(mol)
             # make sure were not getting None from mutation
             if mutated_mol is not None:
                 print(Chem.MolToSmiles(mutated_mol.mol))
                 self.assertNotEqual(mol.mol.ToBinary(), mutated_mol.mol.ToBinary())
 
-
     def test_isostere_replacement(self):
         for mol in [self.ethanol, self.tnt]:
-            mutated_mol = Molecule.isostere_replacement(mol.mol)
+            mutated_mol = Molecule.isostere_replacement(mol)
             # make sure were not getting None from mutation
             if mutated_mol is not None:
                 print(Chem.MolToSmiles(mutated_mol.mol))
@@ -52,7 +42,7 @@ class TestMolecule(unittest.TestCase):
 
     def test_functional_group_addition(self):
         for mol in [self.ethanol, self.tnt]:
-            mutated_mol = Molecule.functional_group_addition(mol.mol)
+            mutated_mol = Molecule.functional_group_addition(mol)
             # make sure were not getting None from mutation
             if mutated_mol is not None:
                 print(Chem.MolToSmiles(mutated_mol.mol))
