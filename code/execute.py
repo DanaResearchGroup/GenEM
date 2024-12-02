@@ -1,4 +1,9 @@
 from code.helpers.constants import MOLECULES_SMILES
+from code.helpers.optimize_helpers import (
+    normalize_mol_weight,
+    normalize_ob_percentage,
+    normalize_SA_score,
+)
 
 from optimize import MolecularDifferentialEvolution
 
@@ -24,18 +29,9 @@ def advanced_objective_function(
         molecule.calculate_properties()
 
     # Normalized scores for each property
-    mw_score = (
-        1 - abs(molecule.properties["molecular_weight"] - 250) / 250
-    )  # Ideal molecular weight is 250
-    normalized_sascore = (
-        10 - molecule.properties["sascore"]
-    ) / 9  # Ideal SAScore is 1, worst is 10
-    ob_score = 1 - abs(molecule.properties["ob_percentage"]) / 100  # Ideal OB% is 0%
-    # Typical OB% for EMs:
-    # TNT(Trinitrotoluene): around - 74 % (fuel - rich)
-    # RDX(Cyclotrimethylenetrinitramine): around - 22 %
-    # HMX(Cyclotetramethylenetetranitramine): around - 21 %
-    # PETN(Pentaerythritol tetranitrate): around 0 % (near - optimal balance)
+    mw_score = normalize_mol_weight(molecule.properties["molecular_weight"])
+    normalized_sascore = normalize_SA_score(molecule.properties["sascore"])
+    ob_score = normalize_ob_percentage(molecule.properties["ob_percentage"])
 
     # Apply the weights to each property score
     weighted_mw_score = mw_score * mw_weight
