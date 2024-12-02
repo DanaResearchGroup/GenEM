@@ -1,3 +1,5 @@
+import logging
+
 from rdkit import Chem
 
 
@@ -64,7 +66,8 @@ def combine_fragments(smiles):
                 Chem.BondType.SINGLE,
             )
 
-        except Exception:
+        except Exception as e:
+            logging.warning(f"Encountered error while combining fragment {frag} : {e}")
             continue  # Skip this fragment and move on
 
     try:

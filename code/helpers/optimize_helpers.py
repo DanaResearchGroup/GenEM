@@ -35,16 +35,16 @@ def normalize_mol_weight(mol_weight: int):
     return 1 - abs(mol_weight - 250) / 250
 
 
-def normalize_SA_score(sascor: int):
+def normalize_SA_score(sa_score: int):
     """
     Function to normalize molecular weight.
 
     Ideal SAScore is 1, worst is 10.
     """
-    return (10 - sascor) / 9
+    return (10 - sa_score) / 9
 
 
-def normalize_ob_percentage(ob_percentage):
+def normalize_ob_percentage(ob_percentage: int):
     """
     Function to normalize molecular weight.
 
