@@ -23,7 +23,7 @@ jobs:
           conda-solver: libmamba
 
       - name: Run Unit Tests
-        uses: make test
+        run: make test
 
       - name: Collect Logs on Failure
         if: failure()
