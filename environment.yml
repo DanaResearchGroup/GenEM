@@ -1,8 +1,13 @@
-name: gen_em
+name: genem_env
 channels:
   - defaults
   - conda-forge
+  - cantera
   - anaconda
 dependencies:
-  - python == 3.12
-  - rdkit
+  - RDKit
+  - random
+  - logging
+  - numpy
+  - sascorer.py from SAScore repository on github
+  - fpscores.pkl.gz from SAScore repository on github
