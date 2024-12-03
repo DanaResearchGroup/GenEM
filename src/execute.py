@@ -1,11 +1,10 @@
-from code.helpers.constants import MOLECULES_SMILES
-from code.helpers.optimize_helpers import (
+from optimize import MolecularDifferentialEvolution
+from src.helpers.constants import MOLECULES_SMILES
+from src.helpers.optimize_helpers import (
     normalize_mol_weight,
     normalize_ob_percentage,
     normalize_SA_score,
 )
-
-from optimize import MolecularDifferentialEvolution
 
 
 def advanced_objective_function(

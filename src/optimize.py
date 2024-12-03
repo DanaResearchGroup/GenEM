@@ -1,8 +1,8 @@
-import code.helpers.optimize_helpers as oh
-from code.Molecule import Molecule
-
 import numpy as np
 from rdkit import Chem
+
+import src.helpers.optimize_helpers as oh
+from src.Molecule import Molecule
 
 
 class MolecularDifferentialEvolution:

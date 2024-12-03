@@ -1,7 +1,8 @@
 import unittest
-from code.helpers.constants import MOLECULES_SMILES
-from code.Molecule import Molecule
-from code.optimize import MolecularDifferentialEvolution
+
+from src.helpers.constants import MOLECULES_SMILES
+from src.Molecule import Molecule
+from src.optimize import MolecularDifferentialEvolution
 
 
 class TestMolecularDifferentialEvolution(unittest.TestCase):

@@ -1,8 +1,9 @@
 import random
-from code.helpers.molecule_helpers import combine_fragments
 
 from rdkit import Chem
 from rdkit.Chem import AllChem, Descriptors
+
+from src.helpers.molecule_helpers import combine_fragments
 
 
 class Molecule:
