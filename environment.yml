@@ -9,5 +9,3 @@ dependencies:
   - random
   - logging
   - numpy
-  - sascorer.py from SAScore repository on github
-  - fpscores.pkl.gz from SAScore repository on github
