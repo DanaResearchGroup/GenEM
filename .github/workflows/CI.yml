@@ -22,6 +22,16 @@ jobs:
           activate-environment: gen_em
           conda-solver: libmamba
 
+      - name: Debug Environment File
+        run: cat environment.yml
+
+      - name: Check Environment Activation
+        run: |
+          echo "Active environment: $(conda info --envs | grep \*)"
+          python --version
+            - name: List Installed Packages
+              run: conda list
+
       - name: List Installed Packages
         run: conda list
 
