@@ -5,5 +5,5 @@ channels:
   - cantera
   - anaconda
 dependencies:
-  - RDKit
   - numpy
+  - rdkit
