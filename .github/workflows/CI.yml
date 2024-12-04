@@ -33,8 +33,13 @@ jobs:
       - name: List Installed Packages
         run: conda list
 
-      - name: Activate Conda Env
-        run: conda activate gen_em
+      - name: Activate Conda Environment Manually
+        run: |
+          source "$(conda info --base)/etc/profile.d/conda.sh"
+          conda activate gen_em
+          echo "Active environment: $CONDA_DEFAULT_ENV"
+          python --version
+          conda list
 
       - name: List Installed Env
         run: conda env list
