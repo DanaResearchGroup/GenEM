@@ -1,4 +1,4 @@
-name: genem_env
+name: gen_em
 channels:
   - defaults
   - conda-forge
@@ -6,6 +6,5 @@ channels:
   - anaconda
 dependencies:
   - RDKit
-  - random
   - logging
   - numpy
