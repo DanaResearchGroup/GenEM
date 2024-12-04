@@ -22,9 +22,6 @@ jobs:
           activate-environment: gen_em
           conda-solver: libmamba
 
-    - name: Run Unit Tests
-        run: make test
-
       - name: Run Unit Tests
         run: make test
 
