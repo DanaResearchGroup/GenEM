@@ -6,5 +6,4 @@ channels:
   - anaconda
 dependencies:
   - RDKit
-  - logging
   - numpy
