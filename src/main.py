@@ -1,10 +1,15 @@
-from optimize import MolecularDifferentialEvolution
-from src.helpers.constants import MOLECULES_SMILES
-from src.helpers.optimize_helpers import (
+from rdkit import RDLogger
+
+from helpers.constants import MOLECULES_SMILES
+from helpers.optimize_helpers import (
     normalize_mol_weight,
     normalize_ob_percentage,
     normalize_SA_score,
 )
+from optimize import MolecularDifferentialEvolution
+
+# Set log level to suppress warnings
+RDLogger.logger().setLevel(RDLogger.ERROR)
 
 
 def advanced_objective_function(
@@ -28,9 +33,9 @@ def advanced_objective_function(
         molecule.calculate_properties()
 
     # Normalized scores for each property
-    mw_score = normalize_mol_weight(molecule.properties["molecular_weight"])
-    normalized_sascore = normalize_SA_score(molecule.properties["sascore"])
-    ob_score = normalize_ob_percentage(molecule.properties["ob_percentage"])
+    mw_score = normalize_mol_weight(molecule.properties.get("molecular_weight", 0))
+    normalized_sascore = normalize_SA_score(molecule.properties.get("sascore", 0))
+    ob_score = normalize_ob_percentage(molecule.properties.get("ob_percentage", 0))
 
     # Apply the weights to each property score
     weighted_mw_score = mw_score * mw_weight

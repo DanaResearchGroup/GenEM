@@ -3,7 +3,7 @@ import random
 from rdkit import Chem
 from rdkit.Chem import AllChem, Descriptors
 
-from src.helpers.molecule_helpers import combine_fragments
+from helpers.molecule_helpers import combine_fragments
 
 
 class Molecule:
