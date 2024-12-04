@@ -22,8 +22,11 @@ jobs:
           activate-environment: gen_em
           conda-solver: libmamba
 
+      - name: List Installed Packages
+        run: conda list
+
       - name: Run Unit Tests
-        run: conda init; conda activate gen_em; make test
+        run: make test
 
       - name: Collect Logs on Failure
         if: failure()
