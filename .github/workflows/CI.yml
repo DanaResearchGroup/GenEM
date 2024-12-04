@@ -29,8 +29,6 @@ jobs:
         run: |
           echo "Active environment: $(conda info --envs | grep \*)"
           python --version
-            - name: List Installed Packages
-              run: conda list
 
       - name: List Installed Packages
         run: conda list
