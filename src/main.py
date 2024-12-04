@@ -1,58 +1,75 @@
-import numpy as np
+from optimize import MolecularDifferentialEvolution
+from src.helpers.constants import MOLECULES_SMILES
+from src.helpers.optimize_helpers import (
+    normalize_mol_weight,
+    normalize_ob_percentage,
+    normalize_SA_score,
+)
 
-# Objective function to be optimized (you need to define your own)
-def objective_function(properties):
-    # Replace this with your actual objective function
-    return np.sum(np.square(properties))
 
-class Particle:
-    def __init__(self, dimension):
-        self.position = np.random.rand(dimension)  # Initial random position
-        self.velocity = np.random.rand(dimension)  # Initial random velocity
-        self.best_position = self.position.copy()
-        self.best_fitness = float('inf')
+def advanced_objective_function(
+    molecule, mw_weight=0.7, sascore_weight=1.2, ob_weight=0.9
+):
+    """
+    Function to calculate the objective function with weighted properties.
+    Normalizes different properties with the best score being 1.
 
-def particle_swarm_optimization(objective_function, num_particles, num_dimensions, max_iterations, inertia_weight, c1, c2):
-    particles = [Particle(num_dimensions) for _ in range(num_particles)]
-    global_best_position = None
-    global_best_fitness = float('inf')
+    Arguments:
+        molecule (AdvancedMolecularDifferentialEvolution): The molecule being evaluated.
+        mw_weight (float): Weight for molecular weight score (default is 1.0).
+        sascore_weight (float): Weight for SAScore score (default is 1.0).
+        ob_weight (float): Weight for OB% score (default is 1.0).
 
-    for _ in range(max_iterations):
-        for particle in particles:
-            fitness = objective_function(particle.position)
+    Returns:
+        float: The molecule's fitness score based on the weighted properties.
+    """
 
-            # Update personal best
-            if fitness < particle.best_fitness:
-                particle.best_fitness = fitness
-                particle.best_position = particle.position.copy()
+    if not molecule.properties:
+        molecule.calculate_properties()
 
-            # Update global best
-            if fitness < global_best_fitness:
-                global_best_fitness = fitness
-                global_best_position = particle.position.copy()
+    # Normalized scores for each property
+    mw_score = normalize_mol_weight(molecule.properties["molecular_weight"])
+    normalized_sascore = normalize_SA_score(molecule.properties["sascore"])
+    ob_score = normalize_ob_percentage(molecule.properties["ob_percentage"])
 
-        for particle in particles:
-            # Update velocity and position
-            inertia_term = inertia_weight * particle.velocity
-            cognitive_term = c1 * np.random.rand(num_dimensions) * (particle.best_position - particle.position)
-            social_term = c2 * np.random.rand(num_dimensions) * (global_best_position - particle.position)
+    # Apply the weights to each property score
+    weighted_mw_score = mw_score * mw_weight
+    weighted_sascore = normalized_sascore * sascore_weight
+    weighted_ob_score = ob_score * ob_weight
 
-            particle.velocity = inertia_term + cognitive_term + social_term
-            particle.position += particle.velocity
+    # Calculate the total weight
+    total_weight = mw_weight + sascore_weight + ob_weight
 
-    return global_best_position, global_best_fitness
+    # Compute the weighted average fitness score
+    fitness_score = (
+        weighted_mw_score + weighted_sascore + weighted_ob_score
+    ) / total_weight
 
-# Parameters
-num_particles = 20
-num_dimensions = 8
-max_iterations = 100
-inertia_weight = 0.5
-c1 = 1.5  # Cognitive coefficient
-c2 = 1.5  # Social coefficient
+    return fitness_score
 
-# Run PSO
-best_solution, best_fitness = particle_swarm_optimization(objective_function, num_particles, num_dimensions, max_iterations, inertia_weight, c1, c2)
 
-print("Best solution:", best_solution)
-print("Best fitness:", best_fitness)
+# Example usage
+INITIAL_SMILES = [
+    MOLECULES_SMILES["Aspirin"],
+    MOLECULES_SMILES["Testosterone"],
+    MOLECULES_SMILES["Nicotine"],
+    MOLECULES_SMILES["TNT"],
+    MOLECULES_SMILES["RDX"],
+    MOLECULES_SMILES["HMX"],
+    MOLECULES_SMILES["PETN"],
+    MOLECULES_SMILES["Tetryl"],
+    # TODO: find out names (if any) and add to MOLECULES_SMILES
+    "CN1C=NC2=C1C(=O)N(C(=O)N2C)C",
+    "CC(C)CC1=CC=C(C=C1)C(C)C(=O)O",
+    "CC(=O)NC1=CC=C(O)C=C1",
+    "CN(C)CCN1C2=CC=CC=C2SC3=CC=CC=C13",
+    "CN(C)C(=O)C1=CC2=C(N1)C=CC3=C2C=CC4=C3C=CN4C",
+]
 
+de = MolecularDifferentialEvolution(
+    advanced_objective_function, INITIAL_SMILES, crossover_prob=0.5, max_iter=1000
+)
+best_molecule, best_fitness = de.run()
+print(f"Best molecule: {best_molecule.smiles}")
+print(f"Best fitness: {best_fitness}")
+print(best_molecule.properties)
