@@ -2,8 +2,6 @@ name: gen_em
 channels:
   - defaults
   - conda-forge
-  - cantera
-  - anaconda
 dependencies:
   - numpy
   - rdkit

@@ -18,9 +18,12 @@ jobs:
         with:
           auto-update-conda: true
           miniconda-version: latest
-          activate-environment: gen_em
           environment-file: environment.yml
+          activate-environment: gen_em
           conda-solver: libmamba
+
+    - name: Run Unit Tests
+        run: make test
 
       - name: Run Unit Tests
         run: make test
