@@ -33,6 +33,9 @@ jobs:
       - name: List Installed Packages
         run: conda list
 
+      - name: List Installed Env
+        run: conda env list
+
       - name: Run Unit Tests
         run: make test
 
