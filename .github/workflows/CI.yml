@@ -23,7 +23,7 @@ jobs:
           conda-solver: libmamba
 
       - name: Run Unit Tests
-        run: conda activate gen_em; make test
+        run: conda init; conda activate gen_em; make test
 
       - name: Collect Logs on Failure
         if: failure()
