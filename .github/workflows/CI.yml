@@ -22,30 +22,12 @@ jobs:
           activate-environment: gen_em
           conda-solver: libmamba
 
-      - name: Debug Environment File
-        run: cat environment.yml
-
-      - name: Check Environment Activation
-        run: |
-          echo "Active environment: $(conda info --envs | grep \*)"
-          python --version
-
-      - name: List Installed Packages
-        run: conda list
-
-      - name: Activate Conda Environment Manually
+      - name: Run Unit Tests
+        shell: bash
         run: |
           source "$(conda info --base)/etc/profile.d/conda.sh"
           conda activate gen_em
-          echo "Active environment: $CONDA_DEFAULT_ENV"
-          python --version
-          conda list
-
-      - name: List Installed Env
-        run: conda env list
-
-      - name: Run Unit Tests
-        run: make test
+          python -m unittest discover
 
       - name: Collect Logs on Failure
         if: failure()
