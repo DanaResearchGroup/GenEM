@@ -33,6 +33,9 @@ jobs:
       - name: List Installed Packages
         run: conda list
 
+      - name: Activate Conda Env
+        run: conda activate gen_em
+
       - name: List Installed Env
         run: conda env list
 
