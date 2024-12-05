@@ -1,7 +1,7 @@
 import random
 
 from rdkit import Chem
-from rdkit.Chem import AllChem, Descriptors
+from rdkit.Chem import AllChem
 
 from src.helpers.molecule_helpers import combine_fragments
 
@@ -32,22 +32,6 @@ class Molecule:
         self.properties = {}
         self.best_solution = None
         self.best_fitness = -float("inf")
-
-    def calculate_properties(self):
-        """
-        Function to calculate properties
-        Argument:
-            self (Molecule): Molecule object
-        Returns:
-            properties (dict): Dictionary of properties
-        """
-        if self.mol is None:
-            raise ValueError("Molecule is not valid.")
-        self.properties["molecular_weight"] = Descriptors.ExactMolWt(self.mol)
-        self.properties["logp"] = Descriptors.MolLogP(self.mol)
-        self.properties["num_h_acceptors"] = Descriptors.NumHAcceptors(self.mol)
-        self.properties["num_h_donors"] = Descriptors.NumHDonors(self.mol)
-        self.properties["num_rotatable_bonds"] = Descriptors.NumRotatableBonds(self.mol)
 
     def update_individual(self, index, new_molecule):
         """
