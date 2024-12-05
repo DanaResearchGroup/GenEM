@@ -1,7 +1,7 @@
 import unittest
 
 from src.helpers.constants import MOLECULES_SMILES
-from src.Molecule import Molecule
+from src.molecule import Molecule
 from src.optimize import MolecularDifferentialEvolution
 
 
