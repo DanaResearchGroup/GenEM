@@ -1,6 +1,6 @@
 import random
 
-from src.Molecule import Molecule
+from src.molecule import Molecule
 
 
 def mutate_molecule(molecule: Molecule) -> Molecule:
