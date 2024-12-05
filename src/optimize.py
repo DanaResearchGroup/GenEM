@@ -2,7 +2,7 @@ import numpy as np
 from rdkit import Chem
 
 import src.helpers.optimize_helpers as oh
-from src.Molecule import Molecule
+from src.molecule import Molecule
 
 
 class MolecularDifferentialEvolution:
