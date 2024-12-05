@@ -6,7 +6,7 @@ from rdkit import RDLogger
 # Set log level to suppress warnings
 RDLogger.logger().setLevel(RDLogger.CRITICAL)
 from src.optimize import MolecularDifferentialEvolution
-
+from src.helpers import optimize_helpers
 
 def advanced_objective_function(mol):
     """
@@ -26,14 +26,12 @@ def advanced_objective_function(mol):
     h_acc_score = Descriptors.NumHAcceptors(mol.mol)
     rads_score = Descriptors.NumRadicalElectrons(mol.mol)
     # Normalize the properties between 1 and 0 where 1 is best
-    def normalize_property(score, ideal, max_range):
-        return max(0, 1 - abs(score - ideal) / max_range)
     # Example normalization
-    normalized_mw_score = normalize_property(mw_score, ideal=250, max_range=250)
-    normalized_logp_score = normalize_property(logp_score, ideal=0, max_range=5)  # Assuming max LogP deviation is 5
-    normalized_rot_bonds_score = normalize_property(rot_bonds_score, ideal=0, max_range=10)
-    normalized_h_acc_score = normalize_property(h_acc_score, ideal=1, max_range=5)
-    normalized_rads_score = normalize_property(rads_score, ideal=0, max_range=5)
+    normalized_mw_score = optimize_helpers.normalize_property(mw_score, ideal=250, max_range=250)
+    normalized_logp_score = optimize_helpers.normalize_property(logp_score, ideal=0, max_range=5)  # Assuming max LogP deviation is 5
+    normalized_rot_bonds_score = optimize_helpers.normalize_property(rot_bonds_score, ideal=0, max_range=10)
+    normalized_h_acc_score = optimize_helpers.normalize_property(h_acc_score, ideal=1, max_range=5)
+    normalized_rads_score = optimize_helpers.normalize_property(rads_score, ideal=0, max_range=5)
 
     # Compute the average fitness score
     fitness_score = (normalized_mw_score + normalized_rads_score + normalized_h_acc_score + normalized_rot_bonds_score +
