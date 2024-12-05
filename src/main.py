@@ -1,11 +1,11 @@
-from optimize import MolecularDifferentialEvolution
 from src.helpers.constants import MOLECULES_SMILES
 from rdkit.Chem import Descriptors
-from Molecule import Molecule
+from src.molecule import Molecule
 from rdkit import RDLogger
 
 # Set log level to suppress warnings
 RDLogger.logger().setLevel(RDLogger.CRITICAL)
+from src.optimize import MolecularDifferentialEvolution
 
 
 def advanced_objective_function(mol):
@@ -25,11 +25,9 @@ def advanced_objective_function(mol):
     rot_bonds_score = Descriptors.NumRotatableBonds(mol.mol)
     h_acc_score = Descriptors.NumHAcceptors(mol.mol)
     rads_score = Descriptors.NumRadicalElectrons(mol.mol)
-
     # Normalize the properties between 1 and 0 where 1 is best
     def normalize_property(score, ideal, max_range):
         return max(0, 1 - abs(score - ideal) / max_range)
-
     # Example normalization
     normalized_mw_score = normalize_property(mw_score, ideal=250, max_range=250)
     normalized_logp_score = normalize_property(logp_score, ideal=0, max_range=5)  # Assuming max LogP deviation is 5
