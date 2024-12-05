@@ -36,10 +36,20 @@ class MolecularDifferentialEvolution:
         Returns:
             prints initial fitness values of population
         """
+        best_initial_fitness = -float('inf')
+        best_initial_mol = None
         print("Initial fitness values of starting molecules:")
         for i, molecule in enumerate(self.molecular_space):
             fitness = self.objective_function(molecule)
             print(f"Molecule {i+1}: SMILES={molecule.smiles}, Fitness={fitness}")
+            if fitness > best_initial_fitness:
+                best_initial_fitness = fitness
+                best_initial_mol = molecule.smiles
+
+        # Print the best initial fitness
+        print("\nBest Initial Fitness:")
+        print(f"SMILES={best_initial_mol}, Fitness={best_initial_fitness}")
+
 
     def mutate(self, idx):
         """
