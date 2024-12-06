@@ -1,5 +1,5 @@
 from src.helpers.constants import MOLECULES_SMILES
-from src.Molecule import Molecule
+from src.molecule import Molecule
 
 INITIAL_SMILES = [
     MOLECULES_SMILES["Aspirin"],
