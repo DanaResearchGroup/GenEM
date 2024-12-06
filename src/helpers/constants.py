@@ -9,3 +9,16 @@ MOLECULES_SMILES = {
     "Nicotine": "CN1CCC[C@H]1C2=CN=CC=C2",
     "Tetryl": "C1=CC(=C(C(=C1)[N+](=O)[O-])C([N+](=O)[O-])=O)",
 }
+
+
+ISOSTERES = {
+    "C(=O)O": "C(=O)N",  # Carboxylic acid to amide
+    "C(F)(F)F": "C#N",  # Trifluoromethyl to nitrile
+    "c1ccccc1": "c1ccncc1",  # Benzene to pyridine
+    "C1=CC2=C(C=C1)C(=O)N2C(=O)O": "C1=CC2=C(C=C1)C(=O)N2C(=O)O",
+    # Nitro group replacement for energetic materials
+    "C[N+](=O)[O-]": "CC1=CC=C(C(=O)O)C=C1",  # Nitro to carboxyl group
+    # Nitro group replacement to fused ring system
+    "[O-][N+](=O)C": "[O-][N+](=O)C1=CC=CC=C1",  # Nitro group to phenyl ring
+    "[N+](=O)[O-]": "[N+](=O)[O-]C1=CC=C(C(=O)O)C=C1",  # Nitro group to substituted phenyl ring
+}

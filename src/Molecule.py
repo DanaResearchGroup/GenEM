@@ -1,9 +1,12 @@
+from __future__ import annotations
+
 import random
 
 from rdkit import Chem
 from rdkit.Chem import AllChem, Descriptors
 
-from helpers.molecule_helpers import combine_fragments
+from src.helpers.constants import ISOSTERES
+from src.helpers.molecule_helpers import combine_fragments
 
 
 class Molecule:
@@ -14,24 +17,19 @@ class Molecule:
         initial_population(list): List of initial molecules
     """
 
-    def __init__(self, smiles, initial_population=None):
+    def __init__(self, smiles):
         self.smiles = smiles
-        self.population = (
-            [Molecule(smiles) for smiles in initial_population]
-            if initial_population
-            else []
-        )
-        try:
-            self.mol = Chem.MolFromSmiles(smiles)
-            if self.mol is None:
-                raise ValueError(f"Invalid SMILES string: {smiles}")
-        except Exception as e:
-            print(f"Error: {e}")
-            self.mol = None  # Set to None if SMILES parsing fails
-        self.fingerprint = None
         self.properties = {}
         self.best_solution = None
         self.best_fitness = -float("inf")
+
+        try:
+            self.rdkit_mol = Chem.MolFromSmiles(smiles)
+            if self.rdkit_mol is None:
+                raise ValueError(f"Invalid SMILES string: {smiles}")
+        except Exception as e:
+            print(f"Error: {e}")
+            self.rdkit_mol = None  # Set to None if SMILES parsing fails
 
     def calculate_properties(self):
         """
@@ -41,24 +39,15 @@ class Molecule:
         Returns:
             properties (dict): Dictionary of properties
         """
-        if self.mol is None:
+        if self.rdkit_mol is None:
             raise ValueError("Molecule is not valid.")
-        self.properties["molecular_weight"] = Descriptors.ExactMolWt(self.mol)
-        self.properties["logp"] = Descriptors.MolLogP(self.mol)
-        self.properties["num_h_acceptors"] = Descriptors.NumHAcceptors(self.mol)
-        self.properties["num_h_donors"] = Descriptors.NumHDonors(self.mol)
-        self.properties["num_rotatable_bonds"] = Descriptors.NumRotatableBonds(self.mol)
-
-    def update_individual(self, index, new_molecule):
-        """
-        Function to update individual from population
-        Argument:
-            index (int): index of population
-            new_molecule (Molecule): new molecule
-        Returns:
-            new_molecule (Molecule): updated molecule
-        """
-        self.population[index] = new_molecule
+        self.properties["molecular_weight"] = Descriptors.ExactMolWt(self.rdkit_mol)
+        self.properties["logp"] = Descriptors.MolLogP(self.rdkit_mol)
+        self.properties["num_h_acceptors"] = Descriptors.NumHAcceptors(self.rdkit_mol)
+        self.properties["num_h_donors"] = Descriptors.NumHDonors(self.rdkit_mol)
+        self.properties["num_rotatable_bonds"] = Descriptors.NumRotatableBonds(
+            self.rdkit_mol
+        )
 
     def calculate_population_fitness(self, objective_function):
         """
@@ -85,7 +74,7 @@ class Molecule:
         Return:
             mol(Molecule): Molecule which is represented as fingerprint
         """
-        mol = Chem.RWMol(mol.mol)
+        mol = Chem.RWMol(mol.rdkit_mol)
         if mol.GetNumAtoms() > 0:
             atom_idx = random.randint(0, mol.GetNumAtoms() - 1)
             atom = mol.GetAtomWithIdx(atom_idx)
@@ -107,7 +96,7 @@ class Molecule:
         return Molecule.sanitize_and_optimize_molecule(mol)
 
     @staticmethod
-    def isostere_replacement(mol):
+    def isostere_replacement(origin_mol: Molecule) -> Molecule | None:
         """
         Function to replace similar functional groups with other functional groups.
         Argument:
@@ -116,47 +105,44 @@ class Molecule:
         Return:
         mol(Molecule): Molecule which is represented as fingerprint
         """
-        original_smiles = Chem.MolToSmiles(mol.mol)
-        mol = Chem.RWMol(mol.mol)
-        ISOSTERES = {
-            "C(=O)O": "C(=O)NH2",  # Carboxylic acid to amide
-            "C(F)(F)F": "C#N",  # Trifluoromethyl to nitrile
-            "c1ccccc1": "c1ccncc1",  # Benzene to pyridine
-            "C1=CC2=C(C=C1)C(=O)N2C(=O)O": "C1=CC2=C(C=C1)C(=O)N2C(=O)O",
-            # Nitro group replacement for energetic materials
-            "C[N+](=O)[O-]": "C1=CC=C(C(=O)O)C=C1",  # Nitro to carboxyl group
-            # Nitro group replacement to fused ring system
-            "[O-][N+](=O)C": "[O-][N+](=O)C1=CC=CC=C1",  # Nitro group to phenyl ring
-            "[N+](=O)[O-]": "[N+](=O)[O-]C1=CC=C(C(=O)O)C=C1",  # Nitro group to substituted phenyl ring
-        }
+
+        editable_mol = Chem.RWMol(origin_mol.rdkit_mol)
 
         try:
-            for original, replacement in ISOSTERES.items():
-                patt = Chem.MolFromSmarts(original)
-                repl = Chem.MolFromSmiles(replacement)
+            for pattern, replacement in ISOSTERES.items():
+                pattern_mol = Chem.MolFromSmiles(pattern)
+                replacement_mol = Chem.MolFromSmiles(replacement)
 
-                if patt and repl and mol.HasSubstructMatch(patt):
-                    mol = AllChem.ReplaceSubstructs(mol, patt, repl, replaceAll=True)[0]
+                if (
+                    pattern_mol
+                    and replacement_mol
+                    and editable_mol.HasSubstructMatch(pattern_mol)
+                ):
+                    print("replacing", pattern, replacement)
+                    editable_mol = AllChem.ReplaceSubstructs(
+                        editable_mol, pattern_mol, replacement_mol, replaceAll=True
+                    )[0]
                     break
         except Exception:
+            # TODO: add log or handler for this exception
             return None  # Return None if the replacement fails
 
-        smiles = Chem.MolToSmiles(mol)
+        new_mol_smiles = Chem.MolToSmiles(editable_mol)
 
         # Check if the molecule was changed
-        if smiles == original_smiles:
+        if new_mol_smiles == origin_mol.properties.get("smiles"):
             return None
 
         # Combine fragments if necessary
-        if "." in smiles:
+        if "." in new_mol_smiles:
             try:
-                combined_mol = combine_fragments(smiles)
+                combined_mol = combine_fragments(new_mol_smiles)
                 if combined_mol:
-                    mol = combined_mol
+                    editable_mol = combined_mol
             except Exception:
                 return None
 
-        return Molecule.sanitize_and_optimize_molecule(mol)
+        return Molecule.sanitize_and_optimize_molecule(editable_mol)
 
     @staticmethod
     def functional_group_addition(mol):
@@ -168,7 +154,7 @@ class Molecule:
         Return:
             mol(Molecule): Molecule which is represented as fingerprint
         """
-        mol = Chem.RWMol(mol.mol)
+        mol = Chem.RWMol(mol.rdkit_mol)
         FUNCTIONAL_GROUPS = ["[OH]", "[NH2]", "[C](=O)[OH]", "[CH3]"]
         if mol.GetNumAtoms() > 0:
             atom_idx = random.randint(0, mol.GetNumAtoms() - 1)
@@ -181,7 +167,7 @@ class Molecule:
         return Molecule.sanitize_and_optimize_molecule(mol)
 
     @staticmethod
-    def sanitize_and_optimize_molecule(mol):
+    def sanitize_and_optimize_molecule(mol: "Molecule") -> "Molecule" | None:
         """
         Function to sanitize the molecule after mutation to improve validity. In addition, logging has been designed
         to track invalid molecules and what mutations are causing them.

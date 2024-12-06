@@ -1,6 +1,6 @@
 import random
 
-from Molecule import Molecule
+from src.Molecule import Molecule
 
 
 def mutate_molecule(molecule: Molecule) -> Molecule:
@@ -22,7 +22,7 @@ def mutate_molecule(molecule: Molecule) -> Molecule:
     for _ in range(3):
         strategy = random.choice(mutation_strategies)
         mutated_molecule = strategy(molecule)
-        if mutated_molecule and mutated_molecule.mol:
+        if mutated_molecule and mutated_molecule.rdkit_mol:
             return mutated_molecule
     return molecule
 

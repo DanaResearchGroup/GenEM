@@ -1,7 +1,5 @@
-import rdkit.Chem
-
-from Molecule import Molecule
-from helpers.constants import MOLECULES_SMILES
+from src.helpers.constants import MOLECULES_SMILES
+from src.Molecule import Molecule
 
 INITIAL_SMILES = [
     MOLECULES_SMILES["Aspirin"],
@@ -21,7 +19,7 @@ INITIAL_SMILES = [
 ]
 count = 0
 hist = [0 for i in INITIAL_SMILES]
-for i in range(20):
+for _ in range(20):
     for j in range(len(INITIAL_SMILES)):
         init_smil = Molecule.isostere_replacement(Molecule(INITIAL_SMILES[j]))
         if init_smil:
@@ -29,7 +27,6 @@ for i in range(20):
             hist[j] += 1
             count += 1
 
-print(count, "out of:", len(INITIAL_SMILES)*20)
+print(count, "out of:", len(INITIAL_SMILES) * 20)
 for h in range(len(hist)):
     print(INITIAL_SMILES[h], ":", hist[h])
-

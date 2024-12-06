@@ -1,12 +1,12 @@
 from rdkit import RDLogger
 
-from helpers.constants import MOLECULES_SMILES
-from helpers.optimize_helpers import (
+from src.helpers.constants import MOLECULES_SMILES
+from src.helpers.optimize_helpers import (
     normalize_mol_weight,
     normalize_ob_percentage,
     normalize_SA_score,
 )
-from optimize import MolecularDifferentialEvolution
+from src.optimize import MolecularDifferentialEvolution
 
 # Set log level to suppress warnings
 RDLogger.logger().setLevel(RDLogger.ERROR)
