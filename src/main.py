@@ -1,54 +1,51 @@
 from rdkit import RDLogger
+from rdkit.Chem import Descriptors
 
 from src.helpers.constants import MOLECULES_SMILES
-from src.helpers.optimize_helpers import (
-    normalize_mol_weight,
-    normalize_ob_percentage,
-    normalize_SA_score,
-)
+from src.helpers.optimize_helpers import normalize_property
 from src.optimize import MolecularDifferentialEvolution
 
 # Set log level to suppress warnings
 RDLogger.logger().setLevel(RDLogger.ERROR)
 
 
-def advanced_objective_function(
-    molecule, mw_weight=0.7, sascore_weight=1.2, ob_weight=0.9
-):
+def advanced_objective_function(mol):
     """
     Function to calculate the objective function with weighted properties.
     Normalizes different properties with the best score being 1.
 
     Arguments:
-        molecule (AdvancedMolecularDifferentialEvolution): The molecule being evaluated.
-        mw_weight (float): Weight for molecular weight score (default is 1.0).
-        sascore_weight (float): Weight for SAScore score (default is 1.0).
-        ob_weight (float): Weight for OB% score (default is 1.0).
-
+        mol (Molecule): The molecule being evaluated.
     Returns:
         float: The molecule's fitness score based on the weighted properties.
     """
 
-    if not molecule.properties:
-        molecule.calculate_properties()
+    # Calculate 'fake' properties to imitate optimization
+    mw_score = Descriptors.ExactMolWt(mol.rdkit_mol)
+    logp_score = Descriptors.MolLogP(mol.rdkit_mol)
+    rot_bonds_score = Descriptors.NumRotatableBonds(mol.rdkit_mol)
+    h_acc_score = Descriptors.NumHAcceptors(mol.rdkit_mol)
+    rads_score = Descriptors.NumRadicalElectrons(mol.rdkit_mol)
+    # Normalize the properties between 1 and 0 where 1 is best
+    # Example normalization
+    normalized_mw_score = normalize_property(mw_score, ideal=250, max_range=250)
+    normalized_logp_score = normalize_property(
+        logp_score, ideal=0, max_range=5
+    )  # Assuming max LogP deviation is 5
+    normalized_rot_bonds_score = normalize_property(
+        rot_bonds_score, ideal=0, max_range=10
+    )
+    normalized_h_acc_score = normalize_property(h_acc_score, ideal=1, max_range=5)
+    normalized_rads_score = normalize_property(rads_score, ideal=0, max_range=5)
 
-    # Normalized scores for each property
-    mw_score = normalize_mol_weight(molecule.properties.get("molecular_weight", 0))
-    normalized_sascore = normalize_SA_score(molecule.properties.get("sascore", 0))
-    ob_score = normalize_ob_percentage(molecule.properties.get("ob_percentage", 0))
-
-    # Apply the weights to each property score
-    weighted_mw_score = mw_score * mw_weight
-    weighted_sascore = normalized_sascore * sascore_weight
-    weighted_ob_score = ob_score * ob_weight
-
-    # Calculate the total weight
-    total_weight = mw_weight + sascore_weight + ob_weight
-
-    # Compute the weighted average fitness score
+    # Compute the average fitness score
     fitness_score = (
-        weighted_mw_score + weighted_sascore + weighted_ob_score
-    ) / total_weight
+        normalized_mw_score
+        + normalized_rads_score
+        + normalized_h_acc_score
+        + normalized_rot_bonds_score
+        + normalized_logp_score
+    ) / 5
 
     return fitness_score
 
@@ -72,9 +69,8 @@ INITIAL_SMILES = [
 ]
 
 de = MolecularDifferentialEvolution(
-    advanced_objective_function, INITIAL_SMILES, crossover_prob=0.5, max_iter=1000
+    advanced_objective_function, INITIAL_SMILES, crossover_prob=0.5, max_iter=50
 )
 best_molecule, best_fitness = de.run()
-print(f"Best molecule: {best_molecule.smiles}")
-print(f"Best fitness: {best_fitness}")
-print(best_molecule.properties)
+print("\nBest Final Fitness:")
+print(f"SMILES={best_molecule.smiles}, Fitness={best_fitness}")

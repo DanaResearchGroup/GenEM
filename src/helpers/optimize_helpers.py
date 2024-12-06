@@ -1,6 +1,6 @@
 import random
 
-from src.Molecule import Molecule
+from src.molecule import Molecule
 
 
 def mutate_molecule(molecule: Molecule) -> Molecule:
@@ -27,34 +27,5 @@ def mutate_molecule(molecule: Molecule) -> Molecule:
     return molecule
 
 
-def normalize_mol_weight(mol_weight: int):
-    """
-    Function to normalize molecular weight.
-
-    Ideal molecular weight is 250.
-    """
-    return 1 - abs(mol_weight - 250) / 250
-
-
-def normalize_SA_score(sa_score: int):
-    """
-    Function to normalize molecular weight.
-
-    Ideal SAScore is 1, worst is 10.
-    """
-    return (10 - sa_score) / 9
-
-
-def normalize_ob_percentage(ob_percentage: int):
-    """
-    Function to normalize molecular weight.
-
-    Ideal OB% is 0%.
-
-    # Typical OB% for EMs:
-    # TNT(Trinitrotoluene): around - 74 % (fuel - rich)
-    # RDX(Cyclotrimethylenetrinitramine): around - 22 %
-    # HMX(Cyclotetramethylenetetranitramine): around - 21 %
-    # PETN(Pentaerythritol tetranitrate): around 0 % (near - optimal balance)
-    """
-    return 1 - abs(ob_percentage) / 100
+def normalize_property(score, ideal, max_range):
+    return max(0, 1 - abs(score - ideal) / max_range)

@@ -3,7 +3,7 @@ import unittest
 from rdkit import Chem
 
 from src.helpers.constants import MOLECULES_SMILES
-from src.Molecule import Molecule
+from src.molecule import Molecule
 
 
 class TestMolecule(unittest.TestCase):

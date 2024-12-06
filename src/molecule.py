@@ -3,7 +3,7 @@ from __future__ import annotations
 import random
 
 from rdkit import Chem
-from rdkit.Chem import AllChem, Descriptors
+from rdkit.Chem import AllChem
 
 from src.helpers.constants import ISOSTERES
 from src.helpers.molecule_helpers import combine_fragments
@@ -31,23 +31,16 @@ class Molecule:
             print(f"Error: {e}")
             self.rdkit_mol = None  # Set to None if SMILES parsing fails
 
-    def calculate_properties(self):
+    def update_individual(self, index, new_molecule):
         """
-        Function to calculate properties
+        Function to update individual from population
         Argument:
-            self (Molecule): Molecule object
+            index (int): index of population
+            new_molecule (Molecule): new molecule
         Returns:
-            properties (dict): Dictionary of properties
+            new_molecule (Molecule): updated molecule
         """
-        if self.rdkit_mol is None:
-            raise ValueError("Molecule is not valid.")
-        self.properties["molecular_weight"] = Descriptors.ExactMolWt(self.rdkit_mol)
-        self.properties["logp"] = Descriptors.MolLogP(self.rdkit_mol)
-        self.properties["num_h_acceptors"] = Descriptors.NumHAcceptors(self.rdkit_mol)
-        self.properties["num_h_donors"] = Descriptors.NumHDonors(self.rdkit_mol)
-        self.properties["num_rotatable_bonds"] = Descriptors.NumRotatableBonds(
-            self.rdkit_mol
-        )
+        self.population[index] = new_molecule
 
     def calculate_population_fitness(self, objective_function):
         """
