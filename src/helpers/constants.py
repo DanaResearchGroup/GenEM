@@ -28,3 +28,5 @@ BACKBONE_LIST = [
 ]
 
 FUNCTIONAL_GROUPS = ["[OH]", "[NH2]", "[C](=O)[OH]", "[CH3]", "NN=O", "C=C", "CC", "NN", "N=N", "N", "O", "C"]
+
+SUBSTITUTIONS = ["C", "N", "O", "S", "H"]

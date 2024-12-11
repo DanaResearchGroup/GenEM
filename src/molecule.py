@@ -5,7 +5,7 @@ import random
 from rdkit import Chem
 from rdkit.Chem import AllChem
 
-from src.helpers.constants import BACKBONE_LIST, FUNCTIONAL_GROUPS
+from src.helpers.constants import BACKBONE_LIST, FUNCTIONAL_GROUPS, SUBSTITUTIONS
 from src.helpers.molecule_helpers import combine_fragments
 
 
@@ -14,7 +14,6 @@ class Molecule:
     Class Molecule
     Args:
         smiles (str): SMILES string
-        initial_population(list): List of initial molecules
     """
 
     def __init__(self, smiles):
@@ -32,46 +31,35 @@ class Molecule:
             self.rdkit_mol = None  # Set to None if SMILES parsing fails
 
     @staticmethod
-    def smart_atom_substitution(mol):
+    def smart_atom_substitution(origin_mol: Molecule) -> Molecule | None:
         """
-        Function to substitute atom with smart atom in order to increase chance of molecular validity.
-        It defines allowed substitutions based on atom type and valence
+        Function to substitute atom with another atom.
         Argument:
-            self(Molecule): Molecule
-            molecule(Molecule): Molecule which is represented as fingerprint
+            mol(Molecule): Molecule class instance
         Return:
-            mol(Molecule): Molecule which is represented as fingerprint
+            mol(Molecule): Molecule class instance
         """
-        mol = Chem.RWMol(mol.rdkit_mol)
-        if mol.GetNumAtoms() > 0:
-            atom_idx = random.randint(0, mol.GetNumAtoms() - 1)
-            atom = mol.GetAtomWithIdx(atom_idx)
-
-            SUBSTITUTIONS = {
-                "C": ["N", "O", "S"],
-                "N": ["C", "O", "S"],
-                "O": ["N", "S"],
-                "S": ["O", "N"],
-            }
-
+        mutated_mol = Chem.RWMol(origin_mol.rdkit_mol)
+        if mutated_mol.GetNumAtoms() > 0:
+            atom_idx = random.randint(0, mutated_mol.GetNumAtoms() - 1)
+            atom = mutated_mol.GetAtomWithIdx(atom_idx)
             original_atom_symbol = atom.GetSymbol()
             if original_atom_symbol in SUBSTITUTIONS:
-                new_atom_symbol = random.choice(SUBSTITUTIONS[original_atom_symbol])
+                new_atom_symbol = random.choice(SUBSTITUTIONS)
                 new_atom = Chem.Atom(new_atom_symbol)
                 new_atom.SetFormalCharge(0)  # Reset formal charge
-                mol.ReplaceAtom(atom_idx, new_atom)
+                mutated_mol.ReplaceAtom(atom_idx, new_atom)
 
-        return Molecule.sanitize_and_optimize_molecule(mol)
+        return Molecule.sanitize_and_optimize_molecule(mutated_mol)
 
     @staticmethod
     def backbone_replacement(origin_mol: Molecule) -> Molecule | None:
         """
-        Function to replace similar functional groups with other functional groups.
+        Function to replace common backbones  with other backbones often found in EMs.
         Argument:
-        self(Molecule): Molecule
-        molecule(Molecule): Molecule which is represented as fingerprint
+        origin_mol(Molecule): Molecule from class Molecule
         Return:
-        mol(Molecule): Molecule which is represented as fingerprint
+        mol(Molecule): Molecule from class Molecule
         """
 
         mutated_mol = Chem.RWMol(origin_mol.rdkit_mol)
