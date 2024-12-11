@@ -5,7 +5,7 @@ import random
 from rdkit import Chem
 from rdkit.Chem import AllChem
 
-from src.helpers.constants import ISOSTERES
+from src.helpers.constants import ISOSTERES_LIST
 from src.helpers.molecule_helpers import combine_fragments
 
 
@@ -76,28 +76,34 @@ class Molecule:
 
         mutated_mol = Chem.RWMol(origin_mol.rdkit_mol)
 
-        try:
-            for pattern, replacement in ISOSTERES.items():
-                pattern_mol = Chem.MolFromSmiles(pattern)
-                replacement_mol = Chem.MolFromSmiles(replacement)
+        possible_matching_pattern = None
 
-                if (
-                    pattern_mol
-                    and replacement_mol
-                    and origin_mol.rdkit_mol.HasSubstructMatch(pattern_mol)
-                ):
-                    all_possible_replacements = AllChem.ReplaceSubstructs(
-                        mutated_mol, pattern_mol, replacement_mol
-                    )
+        # loop through all patterns to find optional replacements
+        for pattern in random.sample(ISOSTERES_LIST, len(ISOSTERES_LIST)):
+            pattern_mol = Chem.MolFromSmiles(pattern)
+            if pattern_mol and origin_mol.rdkit_mol.HasSubstructMatch(
+                pattern_mol
+            ):  # TODO: catch not valid 'pattern_mol' and log them
+                possible_matching_pattern = pattern_mol
+                # once found an optional patter, break the loop
+                break
 
-                    # randomly choose only one of the replacements
-                    mutated_mol = all_possible_replacements[
-                        random.randint(0, len(all_possible_replacements) - 1)
-                    ]
-                    break
-        except Exception:
-            # TODO: add log or handler for this exception
-            return None  # Return None if the replacement fails
+        # find all the possible replacements for a given pattern
+
+        for optional_replacement in random.sample(ISOSTERES_LIST, len(ISOSTERES_LIST)):
+            replacement_mol = Chem.MolFromSmiles(optional_replacement)
+            if (
+                possible_matching_pattern
+                and replacement_mol
+                and optional_replacement != Chem.MolToSmiles(possible_matching_pattern)
+            ):  # TODO: catch not valid 'replacement_mol' and log them
+                possible_replacements = AllChem.ReplaceSubstructs(
+                    mutated_mol, possible_matching_pattern, replacement_mol
+                )
+
+                if possible_replacements and len(possible_replacements):
+                    mutated_mol = random.choice(possible_replacements)
+                break
 
         new_mol_smiles = Chem.MolToSmiles(mutated_mol)
 
@@ -112,6 +118,7 @@ class Molecule:
                 if combined_mol:
                     mutated_mol = combined_mol
             except Exception:
+                # TODO: add log here
                 return None
 
         return Molecule.sanitize_and_optimize_molecule(mutated_mol)
@@ -155,4 +162,5 @@ class Molecule:
             new_smiles = Chem.MolToSmiles(mol)
             return Molecule(new_smiles)
         except Exception:
+            # TODO: log error here
             return None
