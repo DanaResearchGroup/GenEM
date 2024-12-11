@@ -32,10 +32,12 @@ for _ in range(20):
             hist[j][1].add(mutated_mol.smiles)
             count += 1
 
-print(count, "out of:", len(INITIAL_SMILES) * 20)
+print(count, "out of", len(INITIAL_SMILES) * 20)
+molecule_keys_list = list(MOLECULES_SMILES.keys())
 for h in range(len(hist)):
-    print(INITIAL_SMILES[h], ":", hist[h][0])
+    print(molecule_keys_list[h],":", INITIAL_SMILES[h], ",",hist[h][0])
     for j in hist[h][1]:
         print(j)
+
 
 

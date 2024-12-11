@@ -8,6 +8,11 @@ MOLECULES_SMILES = {
     "Testosterone": "CC12CCC3C(C1CCC2O)CCC4=CC(=O)CCC34C",
     "Nicotine": "CN1CCC[C@H]1C2=CN=CC=C2",
     "Tetryl": "C1=CC(=C(C(=C1)[N+](=O)[O-])C([N+](=O)[O-])=O)",
+    "Caffeine": "CN1C=NC2=C1C(=O)N(C(=O)N2C)C",
+    "Ibuprofen": "CC(C)CC1=CC=C(C=C1)C(C)C(=O)O",
+    "Acetaminophen": "CC(=O)NC1=CC=C(O)C=C1",
+    "Promethazine": "CN(C)CCN1C2=CC=CC=C2SC3=CC=CC=C13",
+    "Harmine": "CN(C)C(=O)C1=CC2=C(N1)C=CC3=C2C=CC4=C3C=CN4C",
 }
 
 BACKBONE_LIST = [

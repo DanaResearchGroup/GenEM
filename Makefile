@@ -7,5 +7,8 @@ run-back:
 run-func:
 	python -m src.functional_group_optimization
 
+run-atom:
+	python -m src.atom_substitution_optimization
+
 run:
 	python -m src.main
