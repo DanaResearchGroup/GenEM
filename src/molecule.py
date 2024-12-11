@@ -31,31 +31,6 @@ class Molecule:
             print(f"Error: {e}")
             self.rdkit_mol = None  # Set to None if SMILES parsing fails
 
-    def update_individual(self, index, new_molecule):
-        """
-        Function to update individual from population
-        Argument:
-            index (int): index of population
-            new_molecule (Molecule): new molecule
-        Returns:
-            new_molecule (Molecule): updated molecule
-        """
-        self.population[index] = new_molecule
-
-    def calculate_population_fitness(self, objective_function):
-        """
-        Function to calculate population fitness using a provided objective function
-        Argument:
-            objective_function (function): objective function
-        Returns:
-            None
-        """
-        for mol in self.population:
-            fitness = objective_function(mol)
-            if fitness > self.best_fitness:
-                self.best_fitness = fitness
-                self.best_solution = mol
-
     @staticmethod
     def smart_atom_substitution(mol):
         """
@@ -99,7 +74,7 @@ class Molecule:
         mol(Molecule): Molecule which is represented as fingerprint
         """
 
-        editable_mol = Chem.RWMol(origin_mol.rdkit_mol)
+        mutated_mol = Chem.RWMol(origin_mol.rdkit_mol)
 
         try:
             for pattern, replacement in ISOSTERES.items():
@@ -109,18 +84,22 @@ class Molecule:
                 if (
                     pattern_mol
                     and replacement_mol
-                    and editable_mol.HasSubstructMatch(pattern_mol)
+                    and origin_mol.rdkit_mol.HasSubstructMatch(pattern_mol)
                 ):
-                    print("replacing", pattern, replacement)
-                    editable_mol = AllChem.ReplaceSubstructs(
-                        editable_mol, pattern_mol, replacement_mol, replaceAll=True
-                    )[0]
+                    all_possible_replacements = AllChem.ReplaceSubstructs(
+                        mutated_mol, pattern_mol, replacement_mol
+                    )
+
+                    # randomly choose only one of the replacements
+                    mutated_mol = all_possible_replacements[
+                        random.randint(0, len(all_possible_replacements) - 1)
+                    ]
                     break
         except Exception:
             # TODO: add log or handler for this exception
             return None  # Return None if the replacement fails
 
-        new_mol_smiles = Chem.MolToSmiles(editable_mol)
+        new_mol_smiles = Chem.MolToSmiles(mutated_mol)
 
         # Check if the molecule was changed
         if new_mol_smiles == origin_mol.properties.get("smiles"):
@@ -131,11 +110,11 @@ class Molecule:
             try:
                 combined_mol = combine_fragments(new_mol_smiles)
                 if combined_mol:
-                    editable_mol = combined_mol
+                    mutated_mol = combined_mol
             except Exception:
                 return None
 
-        return Molecule.sanitize_and_optimize_molecule(editable_mol)
+        return Molecule.sanitize_and_optimize_molecule(mutated_mol)
 
     @staticmethod
     def functional_group_addition(mol):
@@ -160,7 +139,7 @@ class Molecule:
         return Molecule.sanitize_and_optimize_molecule(mol)
 
     @staticmethod
-    def sanitize_and_optimize_molecule(mol: "Molecule") -> "Molecule" | None:
+    def sanitize_and_optimize_molecule(mol: Molecule) -> Molecule | None:
         """
         Function to sanitize the molecule after mutation to improve validity. In addition, logging has been designed
         to track invalid molecules and what mutations are causing them.
