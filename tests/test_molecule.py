@@ -33,9 +33,9 @@ class TestMolecule(unittest.TestCase):
                 print(Chem.MolToSmiles(mutated_mol.rdkit_mol))
                 self.assertNotEqual(mol.rdkit_mol.ToBinary(), mutated_mol.rdkit_mol.ToBinary())
 
-    def test_isostere_replacement(self):
+    def test_backbone_replacement(self):
         for mol in [self.ethanol, self.tnt]:
-            mutated_mol = Molecule.isostere_replacement(mol)
+            mutated_mol = Molecule.backbone_replacement(mol)
             # make sure were not getting None from mutation
             if mutated_mol is not None:
                 print(Chem.MolToSmiles(mutated_mol.rdkit_mol))

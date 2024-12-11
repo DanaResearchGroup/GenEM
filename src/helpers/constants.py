@@ -10,7 +10,7 @@ MOLECULES_SMILES = {
     "Tetryl": "C1=CC(=C(C(=C1)[N+](=O)[O-])C([N+](=O)[O-])=O)",
 }
 
-ISOSTERES_LIST = [
+BACKBONE_LIST = [
     "C(=O)O",
     "C(=O)N",
     "C(F)(F)F",

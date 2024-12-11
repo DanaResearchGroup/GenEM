@@ -26,11 +26,10 @@ count = 0
 hist = [[0, set()] for _ in INITIAL_SMILES]
 for _ in range(20):
     for j in range(len(INITIAL_SMILES)):
-        mutated_mol = Molecule.isostere_replacement(Molecule(INITIAL_SMILES[j]))
+        mutated_mol = Molecule.backbone_replacement(Molecule(INITIAL_SMILES[j]))
         if mutated_mol:
 
             hist[j][0] += 1
-            hist[j][1].add(Chem.MolToSmarts(mutated_mol.rdkit_mol))
             hist[j][1].add(mutated_mol.smiles)
 
             count += 1

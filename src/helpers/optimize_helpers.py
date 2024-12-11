@@ -16,7 +16,7 @@ def mutate_molecule(molecule: Molecule) -> Molecule:
     """
     mutation_strategies = [
         molecule.smart_atom_substitution,
-        molecule.isostere_replacement,
+        molecule.backbone_replacement,
         molecule.functional_group_addition,
     ]
     for _ in range(3):

@@ -5,7 +5,7 @@ import random
 from rdkit import Chem
 from rdkit.Chem import AllChem
 
-from src.helpers.constants import ISOSTERES_LIST, FUNCTIONAL_GROUPS
+from src.helpers.constants import BACKBONE_LIST, FUNCTIONAL_GROUPS
 from src.helpers.molecule_helpers import combine_fragments
 
 
@@ -64,7 +64,7 @@ class Molecule:
         return Molecule.sanitize_and_optimize_molecule(mol)
 
     @staticmethod
-    def isostere_replacement(origin_mol: Molecule) -> Molecule | None:
+    def backbone_replacement(origin_mol: Molecule) -> Molecule | None:
         """
         Function to replace similar functional groups with other functional groups.
         Argument:
@@ -79,7 +79,7 @@ class Molecule:
         possible_matching_pattern = None
 
         # loop through all patterns to find optional replacements
-        for pattern in random.sample(ISOSTERES_LIST, len(ISOSTERES_LIST)):
+        for pattern in random.sample(BACKBONE_LIST, len(BACKBONE_LIST)):
             pattern_mol = Chem.MolFromSmiles(pattern)
             if pattern_mol and origin_mol.rdkit_mol.HasSubstructMatch(
                     pattern_mol
@@ -90,7 +90,7 @@ class Molecule:
 
         # find all the possible replacements for a given pattern
 
-        for optional_replacement in random.sample(ISOSTERES_LIST, len(ISOSTERES_LIST)):
+        for optional_replacement in random.sample(BACKBONE_LIST, len(BACKBONE_LIST)):
             replacement_mol = Chem.MolFromSmiles(optional_replacement)
             if (
                     possible_matching_pattern

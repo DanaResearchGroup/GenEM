@@ -1,8 +1,8 @@
 test:
 	python -m unittest discover
 
-run-iso:
-	python -m src.isostere_optimization
+run-back:
+	python -m src.backbone_optimization
 
 run-func:
 	python -m src.functional_group_optimization
