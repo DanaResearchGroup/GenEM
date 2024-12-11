@@ -1,0 +1,35 @@
+name: CI Pipeline
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  unit-tests:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up miniconda
+        uses: conda-incubator/setup-miniconda@v3
+        with:
+          auto-update-conda: true
+          miniconda-version: latest
+          environment-file: environment.yml
+          activate-environment: gen_em
+          conda-solver: libmamba
+
+      - name: Run Unit Tests
+        shell: bash
+        run: |
+          source "$(conda info --base)/etc/profile.d/conda.sh"
+          conda activate gen_em
+          python -m unittest discover
+
+      - name: Collect Logs on Failure
+        if: failure()
+        run: |
+          echo "Tests failed. Please check the logs for details."
