@@ -26,3 +26,5 @@ ISOSTERES_LIST = [
     "[N+](=O)[O-]",
     # "[N+](=O)[O-]C1=CC=C(C(=O)O)C=C1",
 ]
+
+FUNCTIONAL_GROUPS = ["[OH]", "[NH2]", "[C](=O)[OH]", "[CH3]", "NN=O", "C=C", "CC", "NN", "N=N", "N", "O", "C"]

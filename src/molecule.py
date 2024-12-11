@@ -5,7 +5,7 @@ import random
 from rdkit import Chem
 from rdkit.Chem import AllChem
 
-from src.helpers.constants import ISOSTERES_LIST
+from src.helpers.constants import ISOSTERES_LIST, FUNCTIONAL_GROUPS
 from src.helpers.molecule_helpers import combine_fragments
 
 
@@ -82,7 +82,7 @@ class Molecule:
         for pattern in random.sample(ISOSTERES_LIST, len(ISOSTERES_LIST)):
             pattern_mol = Chem.MolFromSmiles(pattern)
             if pattern_mol and origin_mol.rdkit_mol.HasSubstructMatch(
-                pattern_mol
+                    pattern_mol
             ):  # TODO: catch not valid 'pattern_mol' and log them
                 possible_matching_pattern = pattern_mol
                 # once found an optional patter, break the loop
@@ -93,9 +93,9 @@ class Molecule:
         for optional_replacement in random.sample(ISOSTERES_LIST, len(ISOSTERES_LIST)):
             replacement_mol = Chem.MolFromSmiles(optional_replacement)
             if (
-                possible_matching_pattern
-                and replacement_mol
-                and optional_replacement != Chem.MolToSmiles(possible_matching_pattern)
+                    possible_matching_pattern
+                    and replacement_mol
+                    and optional_replacement != Chem.MolToSmiles(possible_matching_pattern)
             ):  # TODO: catch not valid 'replacement_mol' and log them
                 possible_replacements = AllChem.ReplaceSubstructs(
                     mutated_mol, possible_matching_pattern, replacement_mol
@@ -134,7 +134,6 @@ class Molecule:
             mol(Molecule): Molecule which is represented as fingerprint
         """
         mol = Chem.RWMol(mol.rdkit_mol)
-        FUNCTIONAL_GROUPS = ["[OH]", "[NH2]", "[C](=O)[OH]", "[CH3]"]
         if mol.GetNumAtoms() > 0:
             atom_idx = random.randint(0, mol.GetNumAtoms() - 1)
             fg = Chem.MolFromSmarts(random.choice(FUNCTIONAL_GROUPS))
