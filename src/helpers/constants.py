@@ -23,15 +23,13 @@ BACKBONE_LIST = [
     "c1ccccc1",
     "c1ccncc1",
     "C1=CC2=C(C=C1)C(=O)N2C(=O)O",
-    "C1=CC2=C(C=C1)C(=O)N2C(=O)O",
     "C[N+](=O)[O-]",
     "CC1=CC=C(C(=O)O)C=C1",
     "[O-][N+](=O)C",
     "[O-][N+](=O)C1=CC=CC=C1",
-    "[N+](=O)[O-]",
     # "[N+](=O)[O-]C1=CC=C(C(=O)O)C=C1",
 ]
 
-FUNCTIONAL_GROUPS = ["[OH]", "[NH2]", "[C](=O)[OH]", "[CH3]", "NN=O", "C=C", "CC", "NN", "N=N", "N", "O", "C"]
+FUNCTIONAL_GROUPS = ["[N+](=O)[O-]", "[OH]", "[NH2]", "[C](=O)[OH]", "[CH3]", "NN=O", "C=C", "CC", "NN", "N=N", "N", "O", "C"]
 
 SUBSTITUTIONS = ["C", "N", "O", "S", "H"]

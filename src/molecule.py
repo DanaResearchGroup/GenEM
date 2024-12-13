@@ -116,10 +116,9 @@ class Molecule:
         """
         Function to add functional groups to molecule.
         Argument:
-            self(Molecule): Molecule
-            molecule(Molecule): Molecule which is represented as fingerprint
+            mol(Molecule): molecule from class Molecule
         Return:
-            mol(Molecule): Molecule which is represented as fingerprint
+            mol(Molecule): molecule from class Molecule
         """
         mol = Chem.RWMol(mol.rdkit_mol)
         if mol.GetNumAtoms() > 0:
@@ -135,13 +134,11 @@ class Molecule:
     @staticmethod
     def sanitize_and_optimize_molecule(mol: Molecule) -> Molecule | None:
         """
-        Function to sanitize the molecule after mutation to improve validity. In addition, logging has been designed
-        to track invalid molecules and what mutations are causing them.
+        Function to sanitize the molecule after mutation to improve validity.
         Argument:
-            self(Molecule): Molecule which is represented as fingerprint
-            mol(Molecule): Molecule which is represented as fingerprint after mutation
+            mol(Molecule): Molecule from class Molecule
         Return:
-            Molecule(new_smiles): Molecule which is represented as fingerprint after undergoing sanitization.
+            Molecule(new_smiles): Molecule from class Molecule after undergoing sanitization.
         """
         try:
             Chem.SanitizeMol(mol)
